@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import { execSync } from 'child_process';
 
 const postsDirectory = path.join(process.cwd(), 'content/pages');
 
@@ -25,6 +26,31 @@ export interface MarkdownContent {
   createdAt?: string;
 }
 
+function getGitDate(filePath: string, type: 'created' | 'modified'): string {
+  try {
+    let command: string;
+    if (type === 'created') {
+      // Get the date of the first commit that added this file
+      command = `git log --follow --format=%ai --diff-filter=A -- "${filePath}" | tail -1`;
+    } else {
+      // Get the date of the last commit that modified this file
+      command = `git log -1 --format=%ai -- "${filePath}"`;
+    }
+    
+    const gitDate = execSync(command, { encoding: 'utf8', cwd: process.cwd() }).trim();
+    
+    if (gitDate) {
+      return new Date(gitDate).toISOString();
+    }
+  } catch (error) {
+    console.warn(`Could not get git date for ${filePath}:`, error);
+  }
+  
+  // Fallback to file system date
+  const stats = fs.statSync(filePath);
+  return type === 'created' ? stats.birthtime.toISOString() : stats.mtime.toISOString();
+}
+
 export function getMarkdownFiles(): string[] {
   if (!fs.existsSync(postsDirectory)) {
     return [];
@@ -42,10 +68,9 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
   
-  // Get file timestamps
-  const stats = fs.statSync(fullPath);
-  const lastModified = stats.mtime.toISOString();
-  const createdAt = stats.birthtime.toISOString();
+  // Get Git dates with fallback to file system dates
+  const lastModified = getGitDate(fullPath, 'modified');
+  const createdAt = getGitDate(fullPath, 'created');
 
   return {
     slug,
