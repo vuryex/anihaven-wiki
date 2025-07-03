@@ -65,7 +65,7 @@ const SupportPage: React.FC = () => {
             <div>
               <h4 className="font-semibold text-text-primary">Account or permissions issues</h4>
               <p className="text-text-secondary text-sm">
-                Contact a staff member on Discord for assistance with account-related problems.
+                Contact a staff member on Discord for assistance with account related problems.
               </p>
             </div>
           </div>
