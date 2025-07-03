@@ -1,0 +1,11 @@
+site_name: "AniHaven Wiki"
+site_description: "AniHaven Community Wiki and Resources"
+discord_url: "https://discord.anihaven.site"
+github_url: "https://github.com/vury-chris"
+twitter_url: "https://twitter.com/vuryex"
+bluesky_url: "https://bsky.app/profile/anihaven.site"
+tiktok_url: "https://tiktok.com/@vurye"
+minecraft_ip: "smp.anihaven.site"
+selected_repos:
+  - "anihaven-wiki"
+  - "aniquiry"
