@@ -1,10 +1,8 @@
 ---
 title: "Expanding The Wiki"
 description: "Learn how to contribute to the AniHaven Wiki and write in Markdown"
-category: "getting-started"
-order: 2
-featured: true
 author: "AniHaven Team"
+lastModified: "July 4, 2025"
 ---
 
 # Expanding The Wiki
@@ -45,6 +43,7 @@ Help us build the best community wiki! This guide will teach you how to contribu
 title: "Expanding The Wiki"
 description: "Learn how to contribute to the AniHaven Wiki and write in Markdown"
 author: "AniHaven Team"
+lastModified: "July 3rd, 2025"
 ---
 
 ... (Information goes here)
@@ -55,6 +54,7 @@ Beginning your markdown with this first chunk of text is important, especially i
 ``` title: ``` edits the page's title on the tab 
 ``` description: ``` is more behinds the scenes. Has to do with SEO
 ``` author: ``` credits the author/editor of the page 
+``` lastModified: ``` date in which the page was edited (To keep the wiki structured we will use the Month > Day > Year format **[i.e., July 3rd, 2025]**)
 ![author_img](/uploads/expanding-wiki-author-demo.png)
 
 

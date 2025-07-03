@@ -8,11 +8,8 @@ interface PageProps {
     description: string;
     content: string;
     lastModified: string;
-    lastModifiedFormatted: string;
     createdAt: string;
-    createdAtFormatted: string;
     author?: string;
-    dateSource?: 'git' | 'filesystem';
   } | null;
 }
 
@@ -47,15 +44,13 @@ const SmpGuidePage: React.FC<PageProps> = ({ content }) => {
         
         <div className="border-t border-gray-700 pt-4">
           <div className="flex items-center justify-between text-sm text-gray-400">
-            <div className="flex items-center space-x-4">
+            <div>
               {content.author && (
                 <span>Last edited by {content.author}</span>
               )}
-              
-              
             </div>
             <div>
-              Last updated: {content.lastModifiedFormatted}
+              Last updated: {content.lastModified}
             </div>
           </div>
         </div>
@@ -69,7 +64,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   try {
     const { getMarkdownContent } = await import('../lib/markdown');
-    content = getMarkdownContent('smpguide');
+    content = getMarkdownContent('smp-guide');
   } catch (error) {
     // Silently fail - no markdown content exists
   }

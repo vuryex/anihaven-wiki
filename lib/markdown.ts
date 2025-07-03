@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import { getBestTimestamps, getFormattedTimestamps, debugFileTimestamps } from './git-dates';
 
 const postsDirectory = path.join(process.cwd(), 'content/pages');
 
@@ -20,12 +19,9 @@ export interface MarkdownContent {
   featured?: boolean;
   content: string;
   rawContent: string;
-  lastModified: string;
-  createdAt: string;
-  lastModifiedFormatted: string; // Human-readable date
-  createdAtFormatted: string; // Human-readable date
+  lastModified: string; // From frontmatter
+  createdAt: string; // From frontmatter
   author?: string;
-  dateSource?: 'git' | 'filesystem'; // Added to show where dates came from
 }
 
 // Helper function to ensure directory exists
@@ -34,6 +30,59 @@ function ensureDirectoryExists(dir: string): void {
     console.log(`Creating directory: ${dir}`);
     fs.mkdirSync(dir, { recursive: true });
   }
+}
+
+// Format date to readable format like "July 3rd, 2025"
+function formatDateToReadable(dateString: string): string {
+  // Handle various date formats
+  let date: Date;
+  
+  // Try parsing as-is first
+  date = new Date(dateString);
+  
+  // If invalid, try common formats
+  if (isNaN(date.getTime())) {
+    // Try MM/DD/YYYY format
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+    }
+  }
+  
+  // If still invalid, try YYYY-MM-DD format
+  if (isNaN(date.getTime())) {
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    }
+  }
+  
+  // If still invalid, return the original string
+  if (isNaN(date.getTime())) {
+    return dateString;
+  }
+  
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const month = months[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+  
+  // Add ordinal suffix (st, nd, rd, th)
+  const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+  
+  return `${month} ${day}${getOrdinalSuffix(day)}, ${year}`;
 }
 
 // Get all markdown files from the pages directory
@@ -62,16 +111,9 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { data, content } = matter(fileContents);
 
-    // Get the best available timestamps (ISO format)
-    const timestamps = getBestTimestamps(fullPath);
-    
-    // Get formatted timestamps (human-readable)
-    const formattedTimestamps = getFormattedTimestamps(fullPath);
-    
-    // Determine date source for debugging
-    const { getFileTimestamps } = require('./git-dates');
-    const stats = getFileTimestamps(fullPath);
-    const dateSource = stats.gitDates ? 'git' : 'filesystem';
+    // Get dates from frontmatter, with fallbacks
+    const lastModified = data.lastModified || data.updated || data.date || 'No date provided';
+    const createdAt = data.createdAt || data.created || data.date || 'No date provided';
 
     return {
       slug,
@@ -82,12 +124,9 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
       featured: data.featured || false,
       content: marked(content),
       rawContent: content,
-      lastModified: timestamps.lastModified, // ISO format for sorting/comparison
-      createdAt: timestamps.createdAt, // ISO format for sorting/comparison
-      lastModifiedFormatted: formattedTimestamps.lastModified, // Human-readable
-      createdAtFormatted: formattedTimestamps.createdAt, // Human-readable
+      lastModified: lastModified,
+      createdAt: createdAt,
       author: data.author || 'Community Member',
-      dateSource
     };
   } catch (error) {
     console.error(`Error processing markdown file ${slug}:`, error);
@@ -115,6 +154,25 @@ export function getAllMarkdownContent(): MarkdownContent[] {
   return allContent;
 }
 
+// Get recent content (sorted by last modified date)
+export function getRecentContent(limit: number = 10): MarkdownContent[] {
+  return getAllMarkdownContent()
+    .filter(content => content.lastModified !== 'No date provided')
+    .sort((a, b) => {
+      // Try to parse dates for sorting
+      const dateA = new Date(a.lastModified);
+      const dateB = new Date(b.lastModified);
+      
+      if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      // If dates can't be parsed, sort by title
+      return a.title.localeCompare(b.title);
+    })
+    .slice(0, limit);
+}
+
 // Get content by category
 export function getContentByCategory(category: string): MarkdownContent[] {
   return getAllMarkdownContent().filter(content => content.category === category);
@@ -135,36 +193,6 @@ export function searchContent(query: string): MarkdownContent[] {
   );
 }
 
-// Debug function to check timestamps for a specific file
-export function debugMarkdownTimestamps(slug: string): void {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  debugFileTimestamps(fullPath);
-}
-
-// Get recent content (sorted by last modified date)
-export function getRecentContent(limit: number = 10): MarkdownContent[] {
-  return getAllMarkdownContent()
-    .sort((a, b) => {
-      // Sort by last modified date (newest first)
-      const dateA = new Date(a.lastModified).getTime();
-      const dateB = new Date(b.lastModified).getTime();
-      return dateB - dateA;
-    })
-    .slice(0, limit);
-}
-
-// Get newest content (sorted by creation date)
-export function getNewestContent(limit: number = 10): MarkdownContent[] {
-  return getAllMarkdownContent()
-    .sort((a, b) => {
-      // Sort by creation date (newest first)
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return dateB - dateA;
-    })
-    .slice(0, limit);
-}
-
 // Get content sorted by various criteria
 export function getSortedContent(
   sortBy: 'title' | 'created' | 'modified' | 'order' = 'title',
@@ -181,10 +209,14 @@ export function getSortedContent(
         comparison = a.title.localeCompare(b.title);
         break;
       case 'created':
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        const createdA = new Date(a.createdAt);
+        const createdB = new Date(b.createdAt);
+        comparison = createdA.getTime() - createdB.getTime();
         break;
       case 'modified':
-        comparison = new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime();
+        const modifiedA = new Date(a.lastModified);
+        const modifiedB = new Date(b.lastModified);
+        comparison = modifiedA.getTime() - modifiedB.getTime();
         break;
       case 'order':
         comparison = (a.order || 0) - (b.order || 0);
@@ -195,23 +227,4 @@ export function getSortedContent(
   });
   
   return limit ? sorted.slice(0, limit) : sorted;
-}
-
-// Get markdown content with detailed timestamp info
-export function getMarkdownContentWithDebug(slug: string): MarkdownContent | null {
-  console.log(`\n=== GETTING MARKDOWN CONTENT: ${slug} ===`);
-  
-  const content = getMarkdownContent(slug);
-  
-  if (content) {
-    console.log('Title:', content.title);
-    console.log('Date source:', content.dateSource);
-    console.log('Created:', content.createdAtFormatted);
-    console.log('Modified:', content.lastModifiedFormatted);
-    console.log('Created (ISO):', content.createdAt);
-    console.log('Modified (ISO):', content.lastModified);
-    console.log('==========================================\n');
-  }
-  
-  return content;
 }

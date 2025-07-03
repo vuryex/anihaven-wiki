@@ -3,15 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "npm run generate-dates && next dev",
-    "build": "npm run generate-dates && next build",
+    "dev": "next dev",
+    "build": "next build",
     "export": "npm run build && next export",
     "start": "next start",
     "lint": "next lint",
-    "generate-dates": "node scripts/generate-dates.js",
-    "generate-dates:force": "rm -f lib/file-dates.json && node scripts/generate-dates.js",
-    "clean": "rm -rf .next out lib/file-dates.json",
-    "fresh-build": "npm run clean && npm run generate-dates && next build"
+    "clean": "rm -rf .next out"
   },
   "dependencies": {
     "axios": "^1.6.0",
