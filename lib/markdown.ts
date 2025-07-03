@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import { getGitTimestamps } from './git-dates';
 
 const postsDirectory = path.join(process.cwd(), 'content/pages');
 
-// Configure marked for better link handling
 marked.setOptions({
   breaks: true,
   gfm: true,
@@ -21,11 +21,10 @@ export interface MarkdownContent {
   content: string;
   rawContent: string;
   lastModified: string;
+  createdAt: string;
   author?: string;
-  createdAt?: string;
 }
 
-// Load cached dates
 let cachedDates: Record<string, { lastModified: string; createdAt: string }> = {};
 try {
   const datesFile = path.join(process.cwd(), 'lib/file-dates.json');
@@ -52,20 +51,24 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
-  
-  // Use cached dates if available
+
   const dates = cachedDates[slug];
   let lastModified: string;
   let createdAt: string;
-  
+
   if (dates) {
     lastModified = dates.lastModified;
     createdAt = dates.createdAt;
   } else {
-    // Fallback to file system dates
-    const stats = fs.statSync(fullPath);
-    lastModified = stats.mtime.toISOString();
-    createdAt = stats.birthtime.toISOString();
+    const gitDates = getGitTimestamps(fullPath);
+    if (gitDates) {
+      lastModified = gitDates.lastModified;
+      createdAt = gitDates.createdAt;
+    } else {
+      const stats = fs.statSync(fullPath);
+      lastModified = stats.mtime.toISOString();
+      createdAt = stats.birthtime.toISOString();
+    }
   }
 
   return {
