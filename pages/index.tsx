@@ -34,7 +34,7 @@ const HomePage: React.FC<HomePageProps> = ({ recentContent }) => {
             <p className="text-text-secondary mb-4">
               Learn how to get started on our SMP!.
             </p>
-            <Link href="/getting-started" className="text-accent-red hover:text-accent-red-hover transition-colors">
+            <Link href="/smp-guide" className="text-accent-red hover:text-accent-red-hover transition-colors">
               Get Started →
             </Link>
           </div>
