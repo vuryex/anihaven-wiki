@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import { execSync } from 'child_process';
 
 const postsDirectory = path.join(process.cwd(), 'content/pages');
 
@@ -26,26 +25,15 @@ export interface MarkdownContent {
   createdAt?: string;
 }
 
-function getGitCommitDate(filePath: string): string {
-  try {
-    const relativePath = path.relative(process.cwd(), filePath);
-    const command = `git log -1 --format=%ci "${relativePath}"`;
-    const result = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
-    return new Date(result.trim()).toISOString();
-  } catch {
-    return new Date().toISOString();
+// Load cached dates
+let cachedDates: Record<string, { lastModified: string; createdAt: string }> = {};
+try {
+  const datesFile = path.join(process.cwd(), 'lib/file-dates.json');
+  if (fs.existsSync(datesFile)) {
+    cachedDates = JSON.parse(fs.readFileSync(datesFile, 'utf8'));
   }
-}
-
-function getGitCreationDate(filePath: string): string {
-  try {
-    const relativePath = path.relative(process.cwd(), filePath);
-    const command = `git log --follow --format=%ci --reverse "${relativePath}" | head -1`;
-    const result = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
-    return new Date(result.trim()).toISOString();
-  } catch {
-    return new Date().toISOString();
-  }
+} catch (error) {
+  console.warn('Could not load cached dates:', error);
 }
 
 export function getMarkdownFiles(): string[] {
@@ -65,8 +53,20 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
   
-  const lastModified = getGitCommitDate(fullPath);
-  const createdAt = getGitCreationDate(fullPath);
+  // Use cached dates if available
+  const dates = cachedDates[slug];
+  let lastModified: string;
+  let createdAt: string;
+  
+  if (dates) {
+    lastModified = dates.lastModified;
+    createdAt = dates.createdAt;
+  } else {
+    // Fallback to file system dates
+    const stats = fs.statSync(fullPath);
+    lastModified = stats.mtime.toISOString();
+    createdAt = stats.birthtime.toISOString();
+  }
 
   return {
     slug,
