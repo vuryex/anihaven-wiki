@@ -26,29 +26,26 @@ export interface MarkdownContent {
   createdAt?: string;
 }
 
-function getGitDate(filePath: string, type: 'created' | 'modified'): string {
+function getGitCommitDate(filePath: string): string {
   try {
-    let command: string;
-    if (type === 'created') {
-      // Get the date of the first commit that added this file
-      command = `git log --follow --format=%ai --diff-filter=A -- "${filePath}" | tail -1`;
-    } else {
-      // Get the date of the last commit that modified this file
-      command = `git log -1 --format=%ai -- "${filePath}"`;
-    }
-    
-    const gitDate = execSync(command, { encoding: 'utf8', cwd: process.cwd() }).trim();
-    
-    if (gitDate) {
-      return new Date(gitDate).toISOString();
-    }
-  } catch (error) {
-    console.warn(`Could not get git date for ${filePath}:`, error);
+    const relativePath = path.relative(process.cwd(), filePath);
+    const command = `git log -1 --format=%ci "${relativePath}"`;
+    const result = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
+    return new Date(result.trim()).toISOString();
+  } catch {
+    return new Date().toISOString();
   }
-  
-  // Fallback to file system date
-  const stats = fs.statSync(filePath);
-  return type === 'created' ? stats.birthtime.toISOString() : stats.mtime.toISOString();
+}
+
+function getGitCreationDate(filePath: string): string {
+  try {
+    const relativePath = path.relative(process.cwd(), filePath);
+    const command = `git log --follow --format=%ci --reverse "${relativePath}" | head -1`;
+    const result = execSync(command, { encoding: 'utf8', cwd: process.cwd() });
+    return new Date(result.trim()).toISOString();
+  } catch {
+    return new Date().toISOString();
+  }
 }
 
 export function getMarkdownFiles(): string[] {
@@ -68,9 +65,8 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data, content } = matter(fileContents);
   
-  // Get Git dates with fallback to file system dates
-  const lastModified = getGitDate(fullPath, 'modified');
-  const createdAt = getGitDate(fullPath, 'created');
+  const lastModified = getGitCommitDate(fullPath);
+  const createdAt = getGitCreationDate(fullPath);
 
   return {
     slug,
