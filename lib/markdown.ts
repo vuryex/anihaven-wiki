@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import { getGitTimestampsAlternative } from './git-dates';
+import { getBestTimestamps, getFormattedTimestamps, debugFileTimestamps } from './git-dates';
 
 const postsDirectory = path.join(process.cwd(), 'content/pages');
 
@@ -22,73 +22,39 @@ export interface MarkdownContent {
   rawContent: string;
   lastModified: string;
   createdAt: string;
+  lastModifiedFormatted: string; // Human-readable date
+  createdAtFormatted: string; // Human-readable date
   author?: string;
+  dateSource?: 'git' | 'filesystem'; // Added to show where dates came from
 }
 
-// Cache for file dates to avoid repeated git calls
-let cachedDates: Record<string, { lastModified: string; createdAt: string }> = {};
-
-// Load cached dates on startup
-try {
-  const datesFile = path.join(process.cwd(), 'lib/file-dates.json');
-  if (fs.existsSync(datesFile)) {
-    cachedDates = JSON.parse(fs.readFileSync(datesFile, 'utf8'));
-  }
-} catch (error) {
-  console.warn('Could not load cached dates:', error);
-}
-
-function getFileTimestamps(slug: string, fullPath: string): { lastModified: string; createdAt: string } {
-  // Check cache first
-  if (cachedDates[slug]) {
-    return cachedDates[slug];
-  }
-
-  // Try to get Git timestamps
-  const gitDates = getGitTimestampsAlternative(fullPath);
-  if (gitDates) {
-    // Cache the result
-    cachedDates[slug] = {
-      lastModified: gitDates.lastModified,
-      createdAt: gitDates.createdAt
-    };
-    return cachedDates[slug];
-  }
-
-  // Fallback to file system stats
-  try {
-    const stats = fs.statSync(fullPath);
-    const fallbackDates = {
-      lastModified: stats.mtime.toISOString(),
-      createdAt: stats.birthtime.toISOString()
-    };
-    
-    // Cache the fallback dates too
-    cachedDates[slug] = fallbackDates;
-    return fallbackDates;
-  } catch (error) {
-    console.warn(`Failed to get file stats for ${fullPath}:`, error);
-    
-    // Ultimate fallback - current time
-    const now = new Date().toISOString();
-    return {
-      lastModified: now,
-      createdAt: now
-    };
+// Helper function to ensure directory exists
+function ensureDirectoryExists(dir: string): void {
+  if (!fs.existsSync(dir)) {
+    console.log(`Creating directory: ${dir}`);
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
+// Get all markdown files from the pages directory
 export function getMarkdownFiles(): string[] {
-  if (!fs.existsSync(postsDirectory)) {
+  ensureDirectoryExists(postsDirectory);
+  
+  try {
+    return fs.readdirSync(postsDirectory)
+      .filter(file => file.endsWith('.md'));
+  } catch (error) {
+    console.warn('Error reading pages directory:', error);
     return [];
   }
-  return fs.readdirSync(postsDirectory).filter(file => file.endsWith('.md'));
 }
 
+// Get markdown content for a specific slug
 export function getMarkdownContent(slug: string): MarkdownContent | null {
   const fullPath = path.join(postsDirectory, `${slug}.md`);
   
   if (!fs.existsSync(fullPath)) {
+    console.log(`Markdown file not found: ${fullPath}`);
     return null;
   }
 
@@ -96,21 +62,32 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { data, content } = matter(fileContents);
 
-    // Get timestamps
-    const { lastModified, createdAt } = getFileTimestamps(slug, fullPath);
+    // Get the best available timestamps (ISO format)
+    const timestamps = getBestTimestamps(fullPath);
+    
+    // Get formatted timestamps (human-readable)
+    const formattedTimestamps = getFormattedTimestamps(fullPath);
+    
+    // Determine date source for debugging
+    const { getFileTimestamps } = require('./git-dates');
+    const stats = getFileTimestamps(fullPath);
+    const dateSource = stats.gitDates ? 'git' : 'filesystem';
 
     return {
       slug,
-      title: data.title || slug.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      title: data.title || slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       description: data.description || '',
       category: data.category || 'general',
       order: data.order || 0,
       featured: data.featured || false,
       content: marked(content),
       rawContent: content,
-      lastModified,
-      createdAt,
+      lastModified: timestamps.lastModified, // ISO format for sorting/comparison
+      createdAt: timestamps.createdAt, // ISO format for sorting/comparison
+      lastModifiedFormatted: formattedTimestamps.lastModified, // Human-readable
+      createdAtFormatted: formattedTimestamps.createdAt, // Human-readable
       author: data.author || 'Community Member',
+      dateSource
     };
   } catch (error) {
     console.error(`Error processing markdown file ${slug}:`, error);
@@ -118,6 +95,7 @@ export function getMarkdownContent(slug: string): MarkdownContent | null {
   }
 }
 
+// Get all markdown content
 export function getAllMarkdownContent(): MarkdownContent[] {
   const files = getMarkdownFiles();
   const allContent = files
@@ -126,43 +104,114 @@ export function getAllMarkdownContent(): MarkdownContent[] {
       return getMarkdownContent(slug);
     })
     .filter((content): content is MarkdownContent => content !== null)
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    .sort((a, b) => {
+      // Sort by order first, then by title
+      if (a.order !== b.order) {
+        return (a.order || 0) - (b.order || 0);
+      }
+      return a.title.localeCompare(b.title);
+    });
 
   return allContent;
 }
 
-export function getMarkdownContentByCategory(category: string): MarkdownContent[] {
-  const allContent = getAllMarkdownContent();
-  return allContent.filter(content => content.category === category);
+// Get content by category
+export function getContentByCategory(category: string): MarkdownContent[] {
+  return getAllMarkdownContent().filter(content => content.category === category);
 }
 
+// Get featured content
 export function getFeaturedContent(): MarkdownContent[] {
-  const allContent = getAllMarkdownContent();
-  return allContent.filter(content => content.featured);
+  return getAllMarkdownContent().filter(content => content.featured);
 }
 
-export function getRecentContent(limit: number = 5): MarkdownContent[] {
-  const allContent = getAllMarkdownContent();
-  return allContent
-    .sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
+// Search content
+export function searchContent(query: string): MarkdownContent[] {
+  const searchTerm = query.toLowerCase();
+  return getAllMarkdownContent().filter(content => 
+    content.title.toLowerCase().includes(searchTerm) ||
+    content.description?.toLowerCase().includes(searchTerm) ||
+    content.rawContent.toLowerCase().includes(searchTerm)
+  );
+}
+
+// Debug function to check timestamps for a specific file
+export function debugMarkdownTimestamps(slug: string): void {
+  const fullPath = path.join(postsDirectory, `${slug}.md`);
+  debugFileTimestamps(fullPath);
+}
+
+// Get recent content (sorted by last modified date)
+export function getRecentContent(limit: number = 10): MarkdownContent[] {
+  return getAllMarkdownContent()
+    .sort((a, b) => {
+      // Sort by last modified date (newest first)
+      const dateA = new Date(a.lastModified).getTime();
+      const dateB = new Date(b.lastModified).getTime();
+      return dateB - dateA;
+    })
     .slice(0, limit);
 }
 
-// Function to save cached dates (call this periodically or on build)
-export function saveCachedDates(): void {
-  try {
-    const datesFile = path.join(process.cwd(), 'lib/file-dates.json');
-    fs.writeFileSync(datesFile, JSON.stringify(cachedDates, null, 2));
-  } catch (error) {
-    console.warn('Could not save cached dates:', error);
-  }
+// Get newest content (sorted by creation date)
+export function getNewestContent(limit: number = 10): MarkdownContent[] {
+  return getAllMarkdownContent()
+    .sort((a, b) => {
+      // Sort by creation date (newest first)
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA;
+    })
+    .slice(0, limit);
 }
 
-// Function to refresh a specific file's cache
-export function refreshFileCache(slug: string): void {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  if (fs.existsSync(fullPath)) {
-    delete cachedDates[slug];
-    getFileTimestamps(slug, fullPath);
+// Get content sorted by various criteria
+export function getSortedContent(
+  sortBy: 'title' | 'created' | 'modified' | 'order' = 'title',
+  ascending: boolean = true,
+  limit?: number
+): MarkdownContent[] {
+  const allContent = getAllMarkdownContent();
+  
+  const sorted = allContent.sort((a, b) => {
+    let comparison = 0;
+    
+    switch (sortBy) {
+      case 'title':
+        comparison = a.title.localeCompare(b.title);
+        break;
+      case 'created':
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        break;
+      case 'modified':
+        comparison = new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime();
+        break;
+      case 'order':
+        comparison = (a.order || 0) - (b.order || 0);
+        break;
+    }
+    
+    return ascending ? comparison : -comparison;
+  });
+  
+  return limit ? sorted.slice(0, limit) : sorted;
+}
+
+// Get markdown content with detailed timestamp info
+export function getMarkdownContentWithDebug(slug: string): MarkdownContent | null {
+  console.log(`\n=== GETTING MARKDOWN CONTENT: ${slug} ===`);
+  
+  const content = getMarkdownContent(slug);
+  
+  if (content) {
+    console.log('Title:', content.title);
+    console.log('Date source:', content.dateSource);
+    console.log('Created:', content.createdAtFormatted);
+    console.log('Modified:', content.lastModifiedFormatted);
+    console.log('Created (ISO):', content.createdAt);
+    console.log('Modified (ISO):', content.lastModified);
+    console.log('==========================================\n');
   }
+  
+  return content;
 }

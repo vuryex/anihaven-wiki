@@ -2,17 +2,21 @@ import React from 'react';
 import Head from 'next/head';
 import { GetStaticProps } from 'next';
 
-interface ExpandingWikiPageProps {
+interface PageProps {
   content: {
     title: string;
     description: string;
     content: string;
     lastModified: string;
+    lastModifiedFormatted: string;
+    createdAt: string;
+    createdAtFormatted: string;
     author?: string;
+    dateSource?: 'git' | 'filesystem';
   } | null;
 }
 
-const ExpandingWikiPage: React.FC<ExpandingWikiPageProps> = ({ content }) => {
+const ExpandingWikiPage: React.FC<PageProps> = ({ content }) => {
   if (!content) {
     return (
       <>
@@ -41,21 +45,16 @@ const ExpandingWikiPage: React.FC<ExpandingWikiPageProps> = ({ content }) => {
           <div dangerouslySetInnerHTML={{ __html: content.content }} />
         </div>
         
-        <div className="border-t border-light-gray pt-4">
-          <div className="flex items-center justify-between text-sm text-text-muted">
-            <div>
+        <div className="border-t border-gray-700 pt-4">
+          <div className="flex items-center justify-between text-sm text-gray-400">
+            <div className="flex items-center space-x-4">
               {content.author && (
                 <span>Last edited by {content.author}</span>
               )}
+              
             </div>
             <div>
-              Last updated: {new Date(content.lastModified).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
+              Last updated: {content.lastModifiedFormatted}
             </div>
           </div>
         </div>

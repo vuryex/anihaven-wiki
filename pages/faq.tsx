@@ -1,5 +1,3 @@
-// Use this template for: tutorials.tsx, support.tsx, faq.tsx, staff.tsx, socials.tsx
-
 import React from 'react';
 import Head from 'next/head';
 import { GetStaticProps } from 'next';
@@ -10,7 +8,11 @@ interface PageProps {
     description: string;
     content: string;
     lastModified: string;
+    lastModifiedFormatted: string;
+    createdAt: string;
+    createdAtFormatted: string;
     author?: string;
+    dateSource?: 'git' | 'filesystem';
   } | null;
 }
 
@@ -19,12 +21,12 @@ const faq: React.FC<PageProps> = ({ content }) => {
     return (
       <>
         <Head>
-          <title>faq - AniHaven Wiki</title>
-          <meta name="description" content="PAGE_DESCRIPTION" />
+          <title>FAQ - AniHaven Wiki</title>
+          <meta name="description" content="Frequently asked questions" />
         </Head>
         
         <div className="text-center py-12">
-          <h1 className="text-3xl font-bold text-text-primary mb-4">PAGE_TITLE</h1>
+          <h1 className="text-3xl font-bold text-text-primary mb-4">FAQ</h1>
           <p className="text-text-secondary">This page hasn't been created yet.</p>
         </div>
       </>
@@ -43,21 +45,16 @@ const faq: React.FC<PageProps> = ({ content }) => {
           <div dangerouslySetInnerHTML={{ __html: content.content }} />
         </div>
         
-        <div className="border-t border-light-gray pt-4">
-          <div className="flex items-center justify-between text-sm text-text-muted">
-            <div>
+        <div className="border-t border-gray-700 pt-4">
+          <div className="flex items-center justify-between text-sm text-gray-400">
+            <div className="flex items-center space-x-4">
               {content.author && (
                 <span>Last edited by {content.author}</span>
               )}
+              
             </div>
             <div>
-              Last updated: {new Date(content.lastModified).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
+              Last updated: {content.lastModifiedFormatted}
             </div>
           </div>
         </div>
@@ -71,7 +68,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   try {
     const { getMarkdownContent } = await import('../lib/markdown');
-    content = getMarkdownContent('faq'); // Change this to match the file
+    content = getMarkdownContent('faq');
   } catch (error) {
     // Silently fail - no markdown content exists
   }

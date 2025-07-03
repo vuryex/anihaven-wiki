@@ -18,7 +18,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const MinecraftStatus: React.FC = () => {
   const { data: status, error } = useSWR<ServerStatus>('/api/minecraft-status', fetcher, {
-    refreshInterval: 60000, // Refresh every minute
+    refreshInterval: 1200000, // Refresh every 2 minutes
   });
 
   if (error) {
