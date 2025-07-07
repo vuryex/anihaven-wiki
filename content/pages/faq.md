@@ -26,7 +26,7 @@ This may be a connection routing issue to the server's network. We recommend eit
 
 # 3. How do I get a rank/role?
 
-Ranks and roles are synced between the [Discord server](https://discord.anihaven.site/) and on our SMP and are obtained by meeting specific requirements on our Discord server. To sync you must log into our Minecraft SMP Server and execute the command `/link`-- once you've done that there should be a code that appears in chat, then navigate to our Discord server and execute the command '/link <your_code>'. 
+Ranks and roles are synced between the [Discord server](https://discord.anihaven.site/) and on our SMP and are obtained by meeting specific requirements on our Discord server. To sync you must log into our Minecraft SMP Server and execute the command `/link`—once you've done that there should be a code that appears in chat, then navigate to our Discord server and execute the command '/link <your_code>'. 
 <br>
 > Base player ranks that are obtained with Chat EXP (e.g., 3rd Class) and you can check if you've met the requirements by typing `t)rank` on our [Discord server](https://discord.anihaven.site/)
 

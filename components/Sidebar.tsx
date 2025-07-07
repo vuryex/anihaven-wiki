@@ -24,7 +24,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, isMobile, onClose }) => {
 
   const staticResources = [
     { name: 'Staff Applications', href: '/staff' },
-    { name: 'Development', href: '/development' },
     { name: 'Our SMP', href: '/smp' },
     { name: 'Socials', href: '/socials' },
   ];
