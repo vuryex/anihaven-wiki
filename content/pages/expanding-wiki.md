@@ -17,10 +17,11 @@ Help us build the best community wiki! This guide will teach you how to contribu
 3. This creates your own copy of the wiki
 
 ### Step 2: Make Your Changes
-1. Navigate to the file you want to edit
+1. Navigate to the file you want to edit 
 2. Click the pencil icon to edit
 3. Make your changes using Markdown
 4. Scroll down and write a commit message
+> To edit a page, direct yourself to the content > pages
 
 ### Step 3: Submit Your Changes
 1. Click **"Propose changes"**
