@@ -276,6 +276,15 @@ body {
 
 .prose blockquote p {
   margin: 0 !important;
+  color: #e0e0e0 !important;
+}
+
+.prose blockquote p:first-child {
+  margin-top: 0 !important;
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0 !important;
 }
 
 .prose table {
