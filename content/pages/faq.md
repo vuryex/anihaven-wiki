@@ -1,18 +1,20 @@
 # 1. What is this server about?
 This server is a community fit for all. We focus on Gaming, Art, Anime, and Programming, but everyone is welcome. We want to be more than just another Discord Community Server, but a place with a culture, where we can make long-lasting memories. Talk about whatever you want (To an extent of course), participate in events with rewards and prize pools, post your creations freely, recruit other users to join your parties, and obviously make new friends and memories. Read more about us [here](https://wiki.anihaven.site/about/).
 
+---
+<br>
+
 # 2. Why am I not able to join the SMP server?
 
 ### Are you getting an error message such as "Failed to verify username" or some weird error?
----
 
 These issues are usually out of our control. They're almost always related to authentication with Mojang/Microsoft's servers which we cannot fix so if these types of errors do occur. Our best suggestion is to restart your game and try again. If even after restarting your game and you're still not able to join, please create a support forum under [#support](https://discord.com/channels/1338369899453485088/1376768807661473834) on our [Community Discord](https://discord.anihaven.site/)
 <br>
 ### Are you getting disconnected shortly after joining?
----
 
 This may be a connection routing issue to the server's network. We recommend either using a VPN (I know, not ideal) or if you want to get technical, try to see if your internet is blocking connections to a specific port or network. If issues still arise, please create a support forum under [#support](https://discord.com/channels/1338369899453485088/1376768807661473834) on our [Community Discord](https://discord.anihaven.site/)
 
+---
 <br>
 
 # 3. How do I get a rank/role?
