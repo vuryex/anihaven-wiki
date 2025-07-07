@@ -54,7 +54,7 @@ const SMPPage: React.FC = () => {
             <ul className="list-disc list-inside space-y-2 text-text-secondary">
               <li>Complex World Generation</li>
               <li>Realistic Survival Experience</li>
-              <li>Premium Bosses, New Biomes, Quests, etc..</li>
+              <li>Premium Bosses, New Biomes, Quests, Mob AI, etc...</li>
               <li>Handpicked and cohesive plugins and datapacks</li>
               <li>Active staff support for Discord & MC</li>
             </ul>
