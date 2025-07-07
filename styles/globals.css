@@ -10,7 +10,7 @@ body {
   background: #000000;
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
 }
 
 ::selection {
@@ -35,21 +35,18 @@ body {
   background: #ff6969;
 }
 
-/* Mobile-first responsive design */
 @media (max-width: 1023px) {
   body {
-    padding-right: 0 !important; /* Prevent body shift when sidebar opens */
+    padding-right: 0 !important;
   }
 }
 
-/* Markdown Content Styling */
 .prose {
   max-width: none !important;
   color: #e0e0e0;
   line-height: 1.7;
 }
 
-/* Mobile responsive prose */
 @media (max-width: 768px) {
   .prose {
     font-size: 0.9rem;
@@ -57,23 +54,24 @@ body {
   }
 }
 
-/* Headers */
 .prose h1 {
   color: #ffffff !important;
   font-size: 2.5rem !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;
-  margin-top: 0 !important;
-  margin-bottom: 1.5rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
   border-bottom: 2px solid #333 !important;
   padding-bottom: 0.5rem !important;
 }
 
-/* Mobile responsive headers */
+.prose h1:first-child {
+  margin-top: 0 !important;
+}
+
 @media (max-width: 768px) {
   .prose h1 {
     font-size: 1.875rem !important;
-    margin-bottom: 1rem !important;
   }
 }
 
@@ -82,16 +80,19 @@ body {
   font-size: 2rem !important;
   font-weight: 600 !important;
   line-height: 1.3 !important;
-  margin-top: 2.5rem !important;
-  margin-bottom: 1.25rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
   border-bottom: 1px solid #333 !important;
   padding-bottom: 0.25rem !important;
+}
+
+.prose h2:first-child {
+  margin-top: 0 !important;
 }
 
 @media (max-width: 768px) {
   .prose h2 {
     font-size: 1.5rem !important;
-    margin-top: 2rem !important;
   }
 }
 
@@ -104,10 +105,13 @@ body {
   margin-bottom: 1rem !important;
 }
 
+.prose h3:first-child {
+  margin-top: 0 !important;
+}
+
 @media (max-width: 768px) {
   .prose h3 {
     font-size: 1.25rem !important;
-    margin-top: 1.5rem !important;
   }
 }
 
@@ -116,14 +120,17 @@ body {
   font-size: 1.25rem !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
-  margin-top: 1.75rem !important;
-  margin-bottom: 0.75rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.prose h4:first-child {
+  margin-top: 0 !important;
 }
 
 @media (max-width: 768px) {
   .prose h4 {
     font-size: 1.125rem !important;
-    margin-top: 1.5rem !important;
   }
 }
 
@@ -131,57 +138,38 @@ body {
   color: #ffffff !important;
   font-size: 1.125rem !important;
   font-weight: 600 !important;
-  margin-top: 1.5rem !important;
-  margin-bottom: 0.75rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.prose h5:first-child {
+  margin-top: 0 !important;
 }
 
 .prose h6 {
   color: #ffffff !important;
   font-size: 1rem !important;
   font-weight: 600 !important;
-  margin-top: 1.25rem !important;
-  margin-bottom: 0.75rem !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
 }
 
-/* Paragraphs */
+.prose h6:first-child {
+  margin-top: 0 !important;
+}
+
 .prose p {
   color: #e0e0e0 !important;
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 1rem !important;
   line-height: 1.7 !important;
 }
 
-/* Add extra spacing between consecutive paragraphs */
-.prose p + p {
-  margin-top: 1rem !important;
-}
-
-/* Handle spacing around headers */
-.prose p + h1,
-.prose p + h2,
-.prose p + h3,
-.prose p + h4,
-.prose p + h5,
-.prose p + h6 {
-  margin-top: 2.5rem !important;
-}
-
-/* Add spacing before paragraphs that follow headings */
-.prose h1 + p,
-.prose h2 + p,
-.prose h3 + p,
-.prose h4 + p,
-.prose h5 + p,
-.prose h6 + p {
-  margin-top: 1rem !important;
-}
-
-/* Links */
 .prose a {
   color: #ff4545 !important;
   text-decoration: none !important;
   border-bottom: 1px solid transparent !important;
   transition: all 0.3s ease !important;
-  word-break: break-word; /* Prevent long URLs from overflowing on mobile */
+  word-break: break-word;
 }
 
 .prose a:hover {
@@ -189,15 +177,14 @@ body {
   border-bottom-color: #ff6969 !important;
 }
 
-/* Lists */
 .prose ul {
-  margin: 1.5rem 0 !important;
+  margin-bottom: 1rem !important;
   padding-left: 1.5rem !important;
   list-style-type: disc !important;
 }
 
 .prose ol {
-  margin: 1.5rem 0 !important;
+  margin-bottom: 1rem !important;
   padding-left: 1.5rem !important;
   list-style-type: decimal !important;
 }
@@ -212,7 +199,6 @@ body {
   margin-bottom: 0.5rem !important;
 }
 
-/* Nested lists */
 .prose ul ul,
 .prose ol ol,
 .prose ul ol,
@@ -221,7 +207,6 @@ body {
   margin-bottom: 0.5rem !important;
 }
 
-/* Strong and emphasis */
 .prose strong {
   color: #ffffff !important;
   font-weight: 600 !important;
@@ -232,7 +217,6 @@ body {
   font-style: italic !important;
 }
 
-/* Code */
 .prose code {
   background: rgba(255, 255, 255, 0.1) !important;
   color: #ff6969 !important;
@@ -240,7 +224,7 @@ body {
   border-radius: 0.25rem !important;
   font-size: 0.875em !important;
   font-family: 'Courier New', monospace !important;
-  word-break: break-word; /* Prevent code overflow on mobile */
+  word-break: break-word;
 }
 
 .prose pre {
@@ -249,14 +233,13 @@ body {
   border-radius: 0.5rem !important;
   padding: 1rem !important;
   overflow-x: auto !important;
-  margin: 2rem 0 !important;
+  margin: 1rem 0 !important;
 }
 
-/* Mobile responsive code blocks */
 @media (max-width: 768px) {
   .prose pre {
     padding: 0.75rem !important;
-    margin: 1.5rem 0 !important;
+    margin: 0.75rem 0 !important;
     border-radius: 0.25rem !important;
   }
 }
@@ -274,12 +257,11 @@ body {
   }
 }
 
-/* Blockquotes */
 .prose blockquote {
   border-left: 4px solid #ff4545 !important;
   background: rgba(255, 69, 69, 0.1) !important;
   padding: 1rem !important;
-  margin: 2rem 0 !important;
+  margin: 1rem 0 !important;
   border-radius: 0 0.5rem 0.5rem 0 !important;
   color: #e0e0e0 !important;
   font-style: italic !important;
@@ -288,7 +270,7 @@ body {
 @media (max-width: 768px) {
   .prose blockquote {
     padding: 0.75rem !important;
-    margin: 1.5rem 0 !important;
+    margin: 0.75rem 0 !important;
   }
 }
 
@@ -296,24 +278,21 @@ body {
   margin: 0 !important;
 }
 
-/* Tables */
 .prose table {
   border-collapse: collapse !important;
   width: 100% !important;
-  margin: 2rem 0 !important;
+  margin: 1rem 0 !important;
   border: 1px solid #333 !important;
   border-radius: 0.5rem !important;
   overflow: hidden !important;
 }
 
-/* Mobile responsive tables */
 @media (max-width: 768px) {
   .prose table {
     font-size: 0.875rem !important;
     overflow-x: auto !important;
     display: block !important;
     white-space: nowrap !important;
-    margin: 1.5rem 0 !important;
   }
   
   .prose thead,
@@ -349,132 +328,56 @@ body {
   color: #e0e0e0 !important;
 }
 
-/* Horizontal rules */
 .prose hr {
   border: none !important;
   height: 1px !important;
   background: #333 !important;
-  margin: 3rem 0 !important;
+  margin: 2rem 0 !important;
 }
 
 @media (max-width: 768px) {
   .prose hr {
-    margin: 2rem 0 !important;
+    margin: 1.5rem 0 !important;
   }
 }
 
-/* Images and Videos - IMPROVED SPACING */
 .prose img,
 .prose video {
   max-width: 100% !important;
   height: auto !important;
   border-radius: 0.5rem !important;
-  margin: 2.5rem 0 !important; /* Increased margin for better spacing */
+  margin: 1rem 0 !important;
   border: 1px solid #333 !important;
   display: block !important;
-}
-
-/* Specific spacing for images/videos followed by text */
-.prose img + p,
-.prose video + p,
-.prose img + h1,
-.prose img + h2,
-.prose img + h3,
-.prose img + h4,
-.prose img + h5,
-.prose img + h6,
-.prose video + h1,
-.prose video + h2,
-.prose video + h3,
-.prose video + h4,
-.prose video + h5,
-.prose video + h6 {
-  margin-top: 2rem !important; /* Extra space after images/videos */
-}
-
-/* Specific spacing for text followed by images/videos */
-.prose p + img,
-.prose p + video,
-.prose h1 + img,
-.prose h2 + img,
-.prose h3 + img,
-.prose h4 + img,
-.prose h5 + img,
-.prose h6 + img,
-.prose h1 + video,
-.prose h2 + video,
-.prose h3 + video,
-.prose h4 + video,
-.prose h5 + video,
-.prose h6 + video {
-  margin-top: 2rem !important; /* Extra space before images/videos */
 }
 
 @media (max-width: 768px) {
   .prose img,
   .prose video {
-    margin: 2rem 0 !important;
+    margin: 0.75rem 0 !important;
     border-radius: 0.25rem !important;
-  }
-  
-  .prose img + p,
-  .prose video + p,
-  .prose img + h1,
-  .prose img + h2,
-  .prose img + h3,
-  .prose img + h4,
-  .prose img + h5,
-  .prose img + h6,
-  .prose video + h1,
-  .prose video + h2,
-  .prose video + h3,
-  .prose video + h4,
-  .prose video + h5,
-  .prose video + h6 {
-    margin-top: 1.5rem !important;
-  }
-  
-  .prose p + img,
-  .prose p + video,
-  .prose h1 + img,
-  .prose h2 + img,
-  .prose h3 + img,
-  .prose h4 + img,
-  .prose h5 + img,
-  .prose h6 + img,
-  .prose h1 + video,
-  .prose h2 + video,
-  .prose h3 + video,
-  .prose h4 + video,
-  .prose h5 + video,
-  .prose h6 + video {
-    margin-top: 1.5rem !important;
   }
 }
 
-/* Image captions (text immediately after images) */
 .prose img + em {
   display: block !important;
   text-align: center !important;
   color: #b0b0b0 !important;
   font-size: 0.875rem !important;
-  margin-top: -1rem !important; /* Pull caption closer to image */
-  margin-bottom: 2rem !important; /* But add space after caption */
+  margin-top: -0.5rem !important;
+  margin-bottom: 1rem !important;
 }
 
 @media (max-width: 768px) {
   .prose img + em {
     font-size: 0.8rem !important;
-    margin-bottom: 1.5rem !important;
   }
 }
 
-/* Checklist items */
 .prose input[type="checkbox"] {
   margin-right: 0.5rem !important;
 }
 
-/* Mobile menu improvements */
 @media (max-width: 1023px) {
   .mobile-menu-button {
     display: block;
@@ -495,14 +398,12 @@ body {
   }
 }
 
-/* Prevent text from being too small on mobile */
 @media (max-width: 640px) {
   html {
-    font-size: 16px; /* Ensure minimum readable font size */
+    font-size: 16px;
   }
 }
 
-/* Animations */
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
@@ -518,25 +419,22 @@ body {
   }
 }
 
-/* Sidebar transition improvements */
 .sidebar-transition {
   transition: transform 0.3s ease-in-out;
 }
 
-/* Touch-friendly button sizing for mobile */
 @media (max-width: 1023px) {
   button, 
   .touch-target {
-    min-height: 44px; /* iOS recommended touch target size */
+    min-height: 44px;
     min-width: 44px;
   }
 }
 
-/* Improve form controls on mobile */
 @media (max-width: 768px) {
   input, 
   textarea, 
   select {
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
   }
 }
