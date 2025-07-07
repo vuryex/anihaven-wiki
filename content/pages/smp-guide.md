@@ -17,4 +17,6 @@ https://github.com/user-attachments/assets/eaf59492-3e4f-47e6-a2c3-59bb57f2d891
 
 After obtaining a flint shard you'll have to obtain a stick (usually through mining leaves). After obtaining a stick use this crafting recipe to make a Flint Hatchet
 
+![flint_hatchet recipe](anihaven-wiki/public/uploads/flint_hatchet.png)
+
 
