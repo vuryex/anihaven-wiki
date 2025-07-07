@@ -50,7 +50,8 @@ After you've obtained one plant string, you are now able to craft a flint hatche
 </video>
 
 <br>
-> More coming soon...
+
+> More Coming Soon...
 
 
 
