@@ -1,3 +1,10 @@
+---
+title: "Tools"
+description: "Tools for AniHaven"
+author: "Chris"
+lastModified: "July 18, 2025"
+---
+
 |Tools|Redirect|About|Date Edited|
 |-|-|-|-|
 |AniBoard|[GitHub](https://github.com/AniHvn/Aniboard)|A simple and easilly customizable Minecraft Plugin for versions 1.21x. __Disclaimer__: Server's must be running on **Java 21**|7/18/25|
