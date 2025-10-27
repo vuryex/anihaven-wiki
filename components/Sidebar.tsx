@@ -11,10 +11,8 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, isMobile, onClose }) => {
   const router = useRouter();
 
-  // Split navigation into different groups
   const communityPages = [
     { name: 'About', href: '/about' },
-    { name: 'SMP Guide', href: '/smp-guide' },
     { name: 'Tutorials', href: '/tutorials' },
     { name: 'Support', href: '/support' },
     { name: 'FAQ', href: '/faq' },
