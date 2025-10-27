@@ -16,7 +16,6 @@ const Layout: React.FC<LayoutProps> = ({ children, config }) => {
   const headerNavigation = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
-    { name: 'SMP Guide', href: '/smp-guide' },
     { name: 'Tutorials', href: '/tutorials' },
     { name: 'Support', href: '/support' },
     { name: 'FAQ', href: '/faq' },
